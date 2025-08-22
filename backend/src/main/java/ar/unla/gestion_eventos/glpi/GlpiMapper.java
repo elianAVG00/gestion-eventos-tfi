@@ -1,8 +1,12 @@
 package ar.unla.gestion_eventos.glpi;
 
 import org.springframework.stereotype.Component;
+import ar.unla.gestion_eventos.Domain.Event;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Map;
 
 @Component
@@ -45,6 +49,25 @@ public class GlpiMapper {
         );
     }
 
+    public Event toEvent(Map<String, Object> ticket, ParsedForm f) {
+        return Event.builder()
+                .title(f.titulo())
+                .description(f.desc())
+                .requestingDepartment(f.departamento())
+                .responsibleName(f.responsableNombre())
+                .responsibleEmail(f.responsableEmail())
+                .responsiblePhone(nonNullStr(ticket.get("phone"), null))
+                .startDateTime(f.inicio() != null ? LocalDateTime.ofInstant(f.inicio(), ZoneId.systemDefault()) : null)
+                .endDateTime(f.fin() != null ? LocalDateTime.ofInstant(f.fin(), ZoneId.systemDefault()) : null)
+                .physicalSpace(f.espacio())
+                .eventType(f.tipo())
+                .estimatedAttendees(f.asistentes())
+                .equipmentNeeded(Collections.emptySet())
+                .needsEarlySetup(f.montajeAnticipado())
+                .needsTechnicalAssistance(f.asistenciaEspecializada())
+                .recurring(f.recurrente())
+                .build();
+    }
     private static int safeInt(String s) {
         try { return Integer.parseInt(s.trim()); } catch (Exception e) { return 0; }
     }
