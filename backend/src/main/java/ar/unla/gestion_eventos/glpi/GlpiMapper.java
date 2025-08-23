@@ -50,15 +50,24 @@ public class GlpiMapper {
     }
 
     public Event toEvent(Map<String, Object> ticket, ParsedForm f) {
+        if (f.inicio() == null){
+            throw new IllegalArgumentException("La fecha de inicio no puede ser nula");
+        }
+
+        if (f.fin() == null){
+            throw new IllegalArgumentException("La fecha de fin no puede ser nula");
+        }
+
         return Event.builder()
+                .glpiTicketId(String.valueOf(ticket.get("id")))
                 .title(f.titulo())
                 .description(f.desc())
                 .requestingDepartment(f.departamento())
                 .responsibleName(f.responsableNombre())
                 .responsibleEmail(f.responsableEmail())
                 .responsiblePhone(nonNullStr(ticket.get("phone"), null))
-                .startDateTime(f.inicio() != null ? LocalDateTime.ofInstant(f.inicio(), ZoneId.systemDefault()) : null)
-                .endDateTime(f.fin() != null ? LocalDateTime.ofInstant(f.fin(), ZoneId.systemDefault()) : null)
+                .startDateTime(LocalDateTime.ofInstant(f.inicio(),ZoneId.systemDefault()))
+                .endDateTime(LocalDateTime.ofInstant(f.fin(), ZoneId.systemDefault()))
                 .physicalSpace(f.espacio())
                 .eventType(f.tipo())
                 .estimatedAttendees(f.asistentes())

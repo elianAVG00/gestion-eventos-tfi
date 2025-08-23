@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,9 +37,41 @@ public class FormAnswerParser {
     }
 
     /** Helpers de conversión: fecha/hora local //hay q revisar estop */
-    public static Instant parseLocalDateTimeToInstant(String value) {
-        if (value == null || value.isBlank()) return null;
-        LocalDateTime ldt = LocalDateTime.parse(value.trim(), FMT);
-        return ldt.atZone(AR).toInstant();
+    public static Instant parseLocalDateTimeToInstant(String dateTimeStr) {
+        if (dateTimeStr == null || dateTimeStr.isBlank()) return null;
+
+        String s = dateTimeStr.trim().replace('\u00A0', ' '); // limpia NBSP
+
+        DateTimeFormatter isoWithSpace = new java.time.format.DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd HH:mm")
+                .optionalStart().appendPattern(":ss").optionalEnd()
+                .toFormatter();
+
+        DateTimeFormatter dmySlash = new java.time.format.DateTimeFormatterBuilder()
+                .appendPattern("dd/MM/yyyy HH:mm")
+                .optionalStart().appendPattern(":ss").optionalEnd()
+                .toFormatter();
+
+        DateTimeFormatter dmyDash = new java.time.format.DateTimeFormatterBuilder()
+                .appendPattern("dd-MM-yyyy HH:mm")
+                .optionalStart().appendPattern(":ss").optionalEnd()
+                .toFormatter();
+
+        DateTimeFormatter[] formatters = new DateTimeFormatter[] {
+                isoWithSpace,                 // "2025-08-21 12:00" o "2025-08-21 12:00:00"
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME, // "2025-08-21T12:00"
+                dmySlash,                     // "21/08/2025 12:00"
+                dmyDash                       // "21-08-2025 12:00"
+        };
+
+        for (DateTimeFormatter f : formatters) {
+            try {
+                LocalDateTime ldt = LocalDateTime.parse(s, f);
+                return ldt.atZone(AR).toInstant(); // usa la zona AR que ya definiste
+            } catch (java.time.format.DateTimeParseException ignore) {}
+        }
+
+        System.err.println("No se pudo parsear la fecha: " + s);
+        return null;
     }
 }
