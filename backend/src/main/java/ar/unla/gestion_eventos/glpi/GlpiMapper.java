@@ -27,7 +27,7 @@ public class GlpiMapper {
         String depto  = qa.getOrDefault("3) Departamento o Área solicitante :", "");
         String respN  = qa.getOrDefault("4) Nombre :", "");
         String respE  = qa.getOrDefault("5) Correo electrónico :", "");
-        String inicio = qa.getOrDefault("7) Fecha y Hora de Inicio solicitada  :", "");
+        String inicio = qa.getOrDefault("7) Fecha y Hora de Inicio solicitada :", "");
         String fin    = qa.getOrDefault("8) Fecha y Hora de Finalización solicitada :", "");
         String espacio= qa.getOrDefault("9) Espacio físico solicitado :", "");
         String tipo   = qa.getOrDefault("10) Tipo de evento :", "");

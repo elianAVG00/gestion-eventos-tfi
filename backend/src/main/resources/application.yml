@@ -6,16 +6,16 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/gestion_eventos?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     username: root
-    password:
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
       hibernate:
-        ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
 glpi:
-  base-url: ${BASE_URL}
-  app-token: ${APP_TOKEN}
-  user-token: ${USER_TOKEN}
+  base-url: http://glpi.local/apirest.php
+  app-token: fNhHOxchUasACOurhOzfWjEzCk0rnDKmjqNqxccr
+  user-token: NvrL7CikJE3KyL6WW7UfOPoZpczj40FoNLS6YVn7
 
