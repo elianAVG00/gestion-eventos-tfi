@@ -10,7 +10,7 @@ spring:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 glpi:
-  base-url: http://glpi.local/apirest.php
-  app-token: fNhHOxchUasACOurhOzfWjEzCk0rnDKmjqNqxccr
-  user-token: NvrL7CikJE3KyL6WW7UfOPoZpczj40FoNLS6YVn7
+  base-url: ${BASE_URL}
+  app-token: ${APP_TOKEN}
+  user-token: ${USER_TOKEN}
 
