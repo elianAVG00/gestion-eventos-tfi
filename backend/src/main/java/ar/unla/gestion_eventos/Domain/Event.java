@@ -33,6 +33,9 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "glpi_ticket_id")
+    private String glpiTicketId;
+
     @NotBlank
     private String title;
 
@@ -75,4 +78,5 @@ public class Event {
     private Boolean needsTechnicalAssistance;
 
     private Boolean recurring;
+
 }
