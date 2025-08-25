@@ -75,12 +75,26 @@ public class GlpiMapper {
                 .needsEarlySetup(f.montajeAnticipado())
                 .needsTechnicalAssistance(f.asistenciaEspecializada())
                 .recurring(f.recurrente())
+                .dateMod(parseInstant(ticket.get("date_mod")))
                 .build();
     }
+
     private static int safeInt(String s) {
         try { return Integer.parseInt(s.trim()); } catch (Exception e) { return 0; }
     }
+
     private static String nonNullStr(Object v, String fallback) {
         return v != null ? String.valueOf(v) : fallback;
+    }
+
+    private static Instant parseInstant(Object v) {
+        if (v == null) return null;
+        try {
+            String s = v.toString().replace(' ', 'T');
+            LocalDateTime ldt = LocalDateTime.parse(s);
+            return ldt.atZone(ZoneId.systemDefault()).toInstant();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

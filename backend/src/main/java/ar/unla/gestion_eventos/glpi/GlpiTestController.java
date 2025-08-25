@@ -4,6 +4,7 @@ import ar.unla.gestion_eventos.Domain.Event;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,4 +34,9 @@ public class GlpiTestController {
         }
     }
 
+    @PostMapping("/sync")
+    public ResponseEntity<GlpiSyncService.SyncResult> sync() {
+        var result = service.syncNow();
+        return ResponseEntity.ok(result);
+    }
 }

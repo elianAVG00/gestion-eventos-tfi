@@ -12,6 +12,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -79,4 +81,7 @@ public class Event {
 
     private Boolean recurring;
 
+    /** Última fecha de modificación del ticket en GLPI usada para la syncro */
+    @Column(name = "glpi_date_mod")
+    private Instant dateMod;
 }
