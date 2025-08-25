@@ -25,7 +25,7 @@ export default function LandingPage() {
             <a className="btn btnPrimary" href="/login">
               Ingresar
             </a>
-            <a className="btn btnGhost" href="/calendario">
+            <a className="btn btnGhost" href="/calendar">
               Ver calendario
             </a>
           </div>
@@ -44,6 +44,7 @@ export default function LandingPage() {
               para validar.
             </p>
           </a>
+          
           <article className="panel">
             <h3 className="pTitle">Validación de conflictos</h3>
             <p className="pText">
@@ -51,13 +52,15 @@ export default function LandingPage() {
               críticos.
             </p>
           </article>
+
           <article className="panel">
-            <h3 className="pTitle">Calendario & reportes</h3>
+            <h3 className="pTitle">Calendario & Reportes</h3>
             <p className="pText">
               Visualización por áreas, estados y métricas para seguimiento
               institucional.
             </p>
           </article>
+
         </section>
 
         <section className="stats">
