@@ -183,6 +183,7 @@ public class GlpiClient {
                 .uri(uri)
                 .header("App-Token", props.appToken())
                 .header("Session-Token", sessionToken)
+                .header("X-GLPI-Sanitized-Content", "false")
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
                 .getBody();
