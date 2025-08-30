@@ -8,11 +8,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -35,17 +35,19 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "glpi_ticket_id")
+    @Column(name = "glpi_ticket_id", unique = true)
     private String glpiTicketId;
 
     @NotBlank
     private String title;
+    private String state;
 
     @NotBlank
     private String description;
 
-    @NotBlank
-    private String requestingDepartment;
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
 
     @NotBlank
     private String responsibleName;
@@ -62,11 +64,13 @@ public class Event {
     @NotNull
     private LocalDateTime endDateTime;
 
-    @NotBlank
-    private String physicalSpace;
+    @ManyToOne
+    @JoinColumn(name = "space_id", nullable = false)
+    private Space space;
 
-    @NotBlank
-    private String eventType;
+    @ManyToOne
+    @JoinColumn(name = "event_type_id", nullable = false)
+    private EventType eventType;
 
     private Integer estimatedAttendees;
 
@@ -74,14 +78,12 @@ public class Event {
     @CollectionTable(name = "event_equipment", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "equipment")
     private Set<String> equipmentNeeded;
-
     private Boolean needsEarlySetup;
-
     private Boolean needsTechnicalAssistance;
-
     private Boolean recurring;
+    private Integer setupTime; // En minutos
+    private Integer teardownTime; // En minutos
 
-    /** Última fecha de modificación del ticket en GLPI usada para la syncro */
     @Column(name = "glpi_date_mod")
     private Instant dateMod;
 }
