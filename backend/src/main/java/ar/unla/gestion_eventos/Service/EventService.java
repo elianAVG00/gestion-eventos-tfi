@@ -47,7 +47,25 @@ public class EventService {
         Event existing = eventRepository.findByGlpiTicketId(String.valueOf(glpiTicketId))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
 
-        Map<String, Object> input = getStringObjectMap(req);
+        Map<String, Object> input = new HashMap<>();
+        if (req.getTitle() != null) {
+            if (req.getTitle().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El título no puede estar vacío");
+            }
+            input.put("name", req.getTitle());
+        }
+        if (req.getDescription() != null) {
+            if (req.getDescription().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La descripción no puede estar vacía");
+            }
+            input.put("content", req.getDescription());
+        }
+        if (req.getStatusId() != null) {
+            input.put("status", req.getStatusId());
+        }
+        if (req.getPriorityId() != null) {
+            input.put("priority", req.getPriorityId());
+        }
 
         if (input.isEmpty()) {
             return new UpdateEventResponse(existing, false, false);
@@ -81,28 +99,5 @@ public class EventService {
         } finally {
             glpiClient.closeSession();
         }
-    }
-
-    private static Map<String, Object> getStringObjectMap(UpdateEventRequest req) {
-        Map<String, Object> input = new HashMap<>();
-        if (req.getTitle() != null) {
-            if (req.getTitle().isBlank()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El título no puede estar vacío");
-            }
-            input.put("name", req.getTitle());
-        }
-        if (req.getDescription() != null) {
-            if (req.getDescription().isBlank()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La descripción no puede estar vacía");
-            }
-            input.put("content", req.getDescription());
-        }
-        if (req.getStatusId() != null) {
-            input.put("status", req.getStatusId());
-        }
-        if (req.getPriorityId() != null) {
-            input.put("priority", req.getPriorityId());
-        }
-        return input;
     }
 }

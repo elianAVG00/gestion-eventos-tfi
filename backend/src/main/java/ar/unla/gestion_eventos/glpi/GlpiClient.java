@@ -223,4 +223,44 @@ public class GlpiClient {
 
         return body != null ? body : List.of();
     }
+
+    /**
+     * Simple DTO q representa un folllowup de GLPI.
+     */
+    public record GlpiFollowup(long id, long glpiTicketId, String content, Instant createdAt, String author) {
+        public GlpiFollowup(long id, long glpiTicketId, String content, Instant createdAt) {
+            this(id, glpiTicketId, content, createdAt, null);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public GlpiFollowup createEventNote(String sessionToken,
+                                        long glpiTicketId,
+                                        String content,
+                                        String visibility) {
+        Map<String, Object> body = Map.of(
+                "input", Map.of(
+                        "itemtype", "Ticket",
+                        "items_id", glpiTicketId,
+                        "content", content
+                )
+        );
+
+        Map<String, Object> resp = rest.post()
+                .uri(props.baseUrl() + "/ITILFollowup?session_write=true")
+                .header("Content-Type", "application/json")
+                .header("Session-Token", sessionToken)
+                .header("App-Token", props.appToken())
+                .header("X-GLPI-Sanitized-Content", "false")
+                .body(body)
+                .retrieve()
+                .body(Map.class);
+
+        long id = 0L;
+        if (resp != null) {
+            Object obj = resp.get("id");
+            if (obj instanceof Number n) id = n.longValue();
+        }
+        return new GlpiFollowup(id, glpiTicketId, content, Instant.now());
+    }
 }
