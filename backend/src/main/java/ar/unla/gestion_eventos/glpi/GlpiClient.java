@@ -2,6 +2,7 @@ package ar.unla.gestion_eventos.glpi;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -77,6 +78,38 @@ public class GlpiClient {
                 .header("X-GLPI-Sanitized-Content", rawHtml ? "false" : "true")
                 .retrieve()
                 .body(Map.class);
+    }
+
+    /** Resultado del update de ticket en GLPI */
+    public record GlpiUpdateResult(boolean success, String message) {}
+
+    /** Realiza el update de un ticket en GLPI */
+    @SuppressWarnings("unchecked")
+    public GlpiUpdateResult updateTicket(String sessionToken, long glpiTicketId, Map<String, Object> input) {
+        var uri = UriComponentsBuilder.fromHttpUrl(props.baseUrl())
+                .path("/Ticket/{id}")
+                .queryParam("session_write", "true")
+                .buildAndExpand(glpiTicketId)
+                .toUri();
+
+        List<Map<String, Object>> body = rest.put()
+                .uri(uri)
+                .header("App-Token", props.appToken())
+                .header("Session-Token", sessionToken)
+                .header("X-GLPI-Sanitized-Content", "false")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("input", input))
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<Map<String, Object>>>() {});
+
+        if (body == null || body.isEmpty()) {
+            return new GlpiUpdateResult(false, "Respuesta vacía de GLPI");
+        }
+        Map<String, Object> first = body.get(0);
+        Object ok = first.get(String.valueOf(glpiTicketId));
+        boolean success = ok instanceof Boolean b && b;
+        String message = String.valueOf(first.getOrDefault("message", ""));
+        return new GlpiUpdateResult(success, message);
     }
 
     @SuppressWarnings("unchecked")

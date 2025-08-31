@@ -26,15 +26,19 @@ public class GlpiSyncService {
     public Event ingestTicket(long ticketId) {
         client.openSession();
         try {
-            Map<String,Object> t = client.getTicket(ticketId, true, true); // expand + HTML crudo
+            Map<String, Object> t = client.getTicket(ticketId, true, true); // expand + HTML crudo
             String html = (String) t.getOrDefault("content", "");
             var respuestaPares = FormAnswerParser.extractRespuestaFormPares(html);
             var respuestaParseada = mapper.toParsedForm(respuestaPares);
-            var eventoExistente = repo.findByGlpiTicketId(String.valueOf(ticketId));
-            if (eventoExistente.isPresent()) return eventoExistente.get();
 
             var nuevoEvento = mapper.toEvent(t, respuestaParseada);
+            var eventoExistente = repo.findByGlpiTicketId(String.valueOf(ticketId));
+            if (eventoExistente.isPresent()) {
+                updateEvent(eventoExistente.get(), nuevoEvento);
+                return repo.save(eventoExistente.get());
+            }
             return repo.save(nuevoEvento);
+
         } finally {
             client.closeSession();
         }
