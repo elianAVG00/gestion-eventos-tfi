@@ -1,0 +1,121 @@
+/* === Lista de eventos (tarjetas) === */
+.event-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.event-card {
+  background-color: #1a1a1a;
+  border: 1px solid var(--gris-oscuro);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  position: relative;
+}
+
+.event-card:hover,
+.event-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  border-color: var(--bordo);
+}
+
+/* Vista mínima */
+.event-title {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--blanco);
+}
+
+.event-row {
+  display: flex;
+  gap: 6px;
+  margin: 2px 0;
+  font-size: 0.92rem;
+}
+
+.event-label {
+  color: var(--gris);
+  min-width: 84px; /* alineación simple */
+}
+
+.event-value {
+  color: var(--blanco);
+}
+
+/* Separador y detalles */
+.event-divider {
+  height: 1px;
+  background: var(--gris-oscuro);
+  margin: 10px 0;
+  opacity: 0.9;
+}
+
+/* Contenedor colapsable (por defecto cerrado) */
+.event-details-collapsible {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 220ms ease;
+}
+
+/* Texto y grilla de detalles */
+.event-description {
+  margin: 0 0 8px 0;
+  color: #e5e5e5;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.event-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.detail-item {
+  background: #111113;
+  border: 1px solid var(--gris-oscuro);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.detail-label {
+  display: block;
+  color: var(--gris);
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  color: var(--blanco);
+  font-size: 0.95rem;
+}
+
+/* Estado expandido (al hover/clic) */
+.event-card.expanded .event-details-collapsible,
+.event-card:hover .event-details-collapsible,
+.event-card:focus-visible .event-details-collapsible {
+  max-height: 400px; /* suficiente para el contenido previsto */
+}
+
+/* Estado visual sutil cuando está expandida por clic */
+.event-card.expanded {
+  border-color: var(--bordo);
+  box-shadow: 0 10px 24px rgba(128, 0, 32, 0.25);
+}
+
+/* Estado vacío / errores que ya usas */
+.no-events-state,
+.loading-state,
+.error-state {
+  color: var(--gris);
+  padding: 16px;
+  text-align: center;
+  border: 1px dashed var(--gris-oscuro);
+  border-radius: var(--radius);
+}

@@ -1,13 +1,20 @@
 package ar.unla.gestion_eventos.glpi;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.ParameterizedType;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +26,9 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class GlpiClient {
+
+    private static final Logger log = LoggerFactory.getLogger(GlpiClient.class);
+
     private final GlpiProperties props;
     private final RestClient rest = RestClient.create();
     private volatile String sessionToken;
@@ -30,21 +40,65 @@ public class GlpiClient {
         return (t != null && t.startsWith("user_token ")) ? t : "user_token " + t;
     }
 
-    /** Abre sesión y guarda Session-Token */
     @SuppressWarnings("unchecked")
     public void openSession() {
-        Map<String, Object> resp = rest.get()
-                .uri(props.baseUrl() + "/initSession?get_full_session=true") // opcional: info extra de sesión
-                .header("Authorization", authHeader())       // <-- igual que Postman
-                .header("App-Token", props.appToken())       // <-- igual que Postman
-                .header("Accept", "application/json")
-                .retrieve()
-                .body(Map.class);
+        // Validaciones mínimas
+        if (props.baseUrl() == null || props.baseUrl().isBlank())
+            throw new IllegalStateException("glpi.base-url no configurada.");
+        if (props.appToken() == null || props.appToken().isBlank())
+            throw new IllegalStateException("glpi.app-token vacío.");
+        if (props.userToken() == null || props.userToken().isBlank())
+            throw new IllegalStateException("glpi.user-token vacío.");
+
+        final String base = trimTrailingSlash(props.baseUrl().trim());
+        final String url  = base + "/initSession?get_full_session=true";
+
+        Map<String, Object> resp;
+
+        // 1) Intento principal: GET + Authorization (igual que el equipo)
+        try {
+            log.debug("GLPI initSession (GET+Authorization) URL: {}", url);
+            resp = rest.get()
+                    .uri(URI.create(url))
+                    .header("Authorization", "user_token " + props.userToken()) // ← formato exacto
+                    .header("App-Token", props.appToken())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .body(Map.class);
+
+        } catch (HttpClientErrorException.BadRequest e) {
+            // 2) Fallback: si el servidor NO recibió Authorization → usar query param
+            final String body = e.getResponseBodyAsString();
+            if (body != null && body.contains("ERROR_LOGIN_PARAMETERS_MISSING")) {
+                final String urlWithToken = url + "&user_token=" +
+                        URLEncoder.encode(props.userToken(), StandardCharsets.UTF_8);
+                log.warn("Authorization no llegó a GLPI. Reintentando (GET+user_token en query).");
+                resp = rest.get()
+                        .uri(URI.create(urlWithToken))
+                        .header("App-Token", props.appToken())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .retrieve()
+                        .body(Map.class);
+            } else {
+                throw e;
+            }
+        }
+
         Object token = (resp != null) ? resp.get("session_token") : null;
         if (token == null) {
-            throw new IllegalStateException("GLPI no devolvió 'session_token'. Verificá tokens/permisos.");
+            throw new IllegalStateException("GLPI no devolvió 'session_token'. Revise credenciales/permisos.");
         }
         this.sessionToken = token.toString();
+    }
+
+    private static String trimTrailingSlash(String s) {
+        return s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
+    }
+    /** Une base y path evitando dobles barras. Admite base con o sin barra final. */
+    private static String joinPath(String base, String path) {
+        String b = base.endsWith("/") ? base.substring(0, base.length() - 1) : base;
+        String p = path.startsWith("/") ? path : "/" + path;
+        return b + p;
     }
 
     /** Cierra sesión si está abierta */
@@ -59,6 +113,7 @@ public class GlpiClient {
     }
 
     public String getSessionToken() {
+
         return sessionToken;
     }
 

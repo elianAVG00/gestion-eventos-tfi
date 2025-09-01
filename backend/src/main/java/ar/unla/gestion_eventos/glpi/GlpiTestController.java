@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class GlpiTestController {
     private final GlpiSyncService service;
+
     //endpoint de prueba despues irian todos en el modulo de api(?
     @PostMapping("/ingest/{id}")
         public Event ingest ( @PathVariable long id) {
@@ -39,4 +40,5 @@ public class GlpiTestController {
         var result = service.syncNow();
         return ResponseEntity.ok(result);
     }
+
 }

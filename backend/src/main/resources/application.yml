@@ -4,9 +4,9 @@ spring:
   application:
     name: gestion-eventos
   datasource:
-    url: jdbc:mysql://localhost:3306/gestion_eventos?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1:8889/gestion_eventos?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password:
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -18,4 +18,3 @@ glpi:
   base-url: ${BASE_URL}
   app-token: ${APP_TOKEN}
   user-token: ${USER_TOKEN}
-

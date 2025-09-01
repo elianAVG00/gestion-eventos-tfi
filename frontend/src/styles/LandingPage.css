@@ -1,0 +1,157 @@
+:root {
+  --negro: #0e0e11;
+  --negro-2: #141417;
+  --blanco: #ffffff;
+  --gris: #bcbcbc;
+  --gris-oscuro: #2e2e2e;
+  --bordo: #800020;
+  --bordo-suave: rgba(128, 0, 32, 0.18);
+  --radius: 12px;
+  --shadow-1: 0 6px 20px rgba(0,0,0,0.35);
+  --maxw: 1120px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--negro); color: var(--blanco); font-family: system-ui,"Segoe UI",Roboto,Arial,sans-serif; }
+
+.lp-wrap {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* ===== Header ===== */
+.lp-header {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto; /* izquierda: marca — derecha: ingresar */
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--gris-oscuro);
+}
+
+.lp-brand-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-logo {
+  width: 40px; height: 40px; border-radius: 999px;
+  background: var(--bordo); color: var(--blanco);
+  display: grid; place-items: center;
+  font-weight: 700; letter-spacing: .5px;
+}
+
+.lp-brand-text { display: flex; align-items: baseline; gap: 10px; }
+.lp-brand-title { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.lp-brand-badge { color: var(--gris); font-size: .9rem; }
+
+.lp-header-actions { display: flex; justify-content: flex-end; }
+
+/* ===== Botones ===== */
+.lp-btn {
+  appearance: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: .95rem;
+  text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px;
+  transition: transform .15s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease;
+  color: var(--blanco);
+}
+
+.lp-btn--primary {
+  background: var(--bordo);
+  border-color: var(--bordo);
+  box-shadow: var(--shadow-1);
+}
+.lp-btn--primary:hover { background: #9a0030; border-color: #9a0030; transform: translateY(-1px); }
+
+/* ===== Hero ===== */
+.lp-hero {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 48px 20px 32px;
+  display: grid;
+  gap: 16px;
+  text-align: center; /* centra título/subtítulo */
+}
+
+.lp-hero-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.2vw + 1rem, 2.4rem);
+  line-height: 1.2;
+}
+
+.lp-hero-subtitle {
+  margin: 0 auto;
+  color: var(--gris);
+  font-size: 1rem;
+  max-width: 70ch;
+}
+
+.lp-hero-cta {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center; /* CTA centrada */
+}
+
+/* ===== Features: columna a la derecha ===== */
+.lp-features {
+  max-width: var(--maxw);
+  margin: 36px auto 28px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;  /* alinea columna a la derecha */
+  gap: 14px;
+}
+
+.lp-card {
+  width: min(620px, 100%); /* columna a la derecha (desktop) */
+  background: var(--negro-2);
+  border: 1px solid var(--gris-oscuro);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+.lp-card--link { text-decoration: none; color: inherit; display: block; }
+
+.lp-card:hover, .lp-card:focus-within {
+  border-color: var(--bordo);
+  box-shadow: 0 10px 28px rgba(128, 0, 32, 0.18);
+  transform: translateY(-2px);
+}
+
+.lp-card-title { margin: 0 0 6px 0; font-size: 1.05rem; font-weight: 700; }
+.lp-card-text { margin: 0; color: var(--gris); line-height: 1.45; }
+
+/* ===== Footer ===== */
+.lp-footer {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--gris);
+  display: flex; justify-content: center; align-items: center; gap: 10px;
+  border-top: 1px solid var(--gris-oscuro);
+}
+.lp-dot { opacity: .6; }
+
+/* Accesibilidad */
+.lp-btn:focus-visible, .lp-card:focus-within { outline: 2px solid var(--bordo); outline-offset: 2px; }
+
+/* Mobile: features full-width */
+@media (max-width: 900px) {
+  .lp-hero { text-align: left; }
+  .lp-hero-subtitle { margin-left: 0; }
+  .lp-features { align-items: stretch; }
+  .lp-card { width: 100%; }
+}
