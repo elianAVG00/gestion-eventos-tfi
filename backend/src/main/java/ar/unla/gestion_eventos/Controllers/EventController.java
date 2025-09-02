@@ -1,4 +1,4 @@
-package ar.unla.gestion_eventos.controllers;
+package ar.unla.gestion_eventos.Controllers;
 
 import ar.unla.gestion_eventos.Domain.Event;
 import ar.unla.gestion_eventos.Service.EventService;

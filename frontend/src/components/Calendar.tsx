@@ -4,6 +4,7 @@ import { Download, Plus, Trash2, X } from "lucide-react";
 import "../styles/Calendar.css";
 import HomeButton from "./HomeButton";
 import type { Event as DomainEvent } from "../interfaces/Event";
+import SyncButton from "./SyncButton";
 
 /** ===================== Tipos UI (presentación) ===================== **/
 type CalendarEvent = {
@@ -380,6 +381,7 @@ export default function InteractiveCalendar() {
       )}
 
       <HomeButton />
+      <SyncButton />
     </div>
   );
 }
