@@ -21,15 +21,15 @@ export default function LandingPage() {
       {/* Hero con CTA centrada */}
       <section className="lp-hero" aria-labelledby="lp-hero-title">
         <h1 id="lp-hero-title" className="lp-hero-title">
-          Planificá y coordiná eventos sin fricción
+          Eventos de la Universidad de Lanús
         </h1>
-        <p className="lp-hero-subtitle">
-          Ingerí solicitudes desde GLPI, validá disponibilidad de espacios y recursos, 
-          y comunicá aprobaciones con trazabilidad.
-        </p>
-        <div className="lp-hero-cta">
+                <div className="lp-hero-cta">
           <a className="lp-btn lp-btn--primary" href="/calendar">📅 Ver calendario</a>
         </div>
+        <p className="lp-hero-subtitle">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur expedita nobis ab rerum, dicta sit corrupti est dolores? Ullam eum possimus veniam atque impedit quis inventore necessitatibus fuga omnis delectus.
+        </p>
+
       </section>
 
       {/* Features: columna vertical alineada a la derecha */}
@@ -55,12 +55,6 @@ export default function LandingPage() {
           </p>
         </article>
 
-        <article className="lp-card">
-          <h3 className="lp-card-title">Calendario & Reportes</h3>
-          <p className="lp-card-text">
-            Vistas por áreas/estados y métricas para seguimiento institucional.
-          </p>
-        </article>
       </section>
 
       <footer className="lp-footer" aria-label="Información del sitio">
