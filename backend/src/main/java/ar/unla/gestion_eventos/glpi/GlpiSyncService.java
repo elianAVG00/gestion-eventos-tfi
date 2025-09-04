@@ -3,7 +3,7 @@ package ar.unla.gestion_eventos.glpi;
 import ar.unla.gestion_eventos.Domain.Event;
 import ar.unla.gestion_eventos.Repository.EventRepository;
 import ar.unla.gestion_eventos.Repository.SyncCursorRepository;
-import ar.unla.gestion_eventos.domain.SyncCursor;
+import ar.unla.gestion_eventos.Domain.SyncCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

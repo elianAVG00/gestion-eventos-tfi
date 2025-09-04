@@ -1,88 +1,67 @@
-import "./LandingPage.css";
-
+import "../styles/LandingPage.css";
 
 export default function LandingPage() {
   return (
-    <div className="wrap">
-      <div className="card">
-        <header className="header">
-          <div className="logo" aria-hidden>
-            ER
+    <main className="lp-wrap">
+      {/* Header: marca a la izquierda, Ingresar arriba a la derecha */}
+      <header className="lp-header" aria-label="Encabezado del sitio">
+        <div className="lp-brand-left">
+          <div className="lp-logo" aria-hidden>ER</div>
+          <div className="lp-brand-text">
+            <strong className="lp-brand-title">Gestión de Eventos</strong>
+            <span className="lp-brand-badge">TFI · UNLa</span>
           </div>
-          <div className="brand">Gestión de Eventos V0.1</div>
-          <span className="badge">TFI · UNLa</span>
-        </header>
+        </div>
 
-        <section className="hero">
-          <h1 className="title">
-            Planificá, aprobá y coordiná eventos sin dolores de cabeza
-          </h1>
-          <p className="subtitle">
-            Ingerí solicitudes desde GLPI, validá disponibilidad de espacios y
-            recursos, y comunicá aprobaciones con trazabilidad.
+        <nav className="lp-header-actions" aria-label="Acción principal">
+          <a className="lp-btn lp-btn--primary" href="/login">Ingresar</a>
+        </nav>
+      </header>
+
+      {/* Hero con CTA centrada */}
+      <section className="lp-hero" aria-labelledby="lp-hero-title">
+        <h1 id="lp-hero-title" className="lp-hero-title">
+          Eventos de la Universidad de Lanús
+        </h1>
+                <div className="lp-hero-cta">
+          <a className="lp-btn lp-btn--primary" href="/calendar">📅 Ver calendario</a>
+        </div>
+        <p className="lp-hero-subtitle">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur expedita nobis ab rerum, dicta sit corrupti est dolores? Ullam eum possimus veniam atque impedit quis inventore necessitatibus fuga omnis delectus.
+        </p>
+
+      </section>
+
+      {/* Features: columna vertical alineada a la derecha */}
+      <section className="lp-features" aria-label="Características">
+        <a className="lp-card lp-card--link" href="/ingesta" aria-label="Ir a Ingesta GLPI">
+          <h3 className="lp-card-title">Ingesta GLPI</h3>
+          <p className="lp-card-text">
+            Conectá tickets aprobados y convertí formularios en eventos listos para validar.
           </p>
-          <div className="ctaRow">
-            <a className="btn btnPrimary" href="/login">
-              Ingresar
-            </a>
-            <a className="btn btnGhost" href="/calendar">
-              Ver calendario
-            </a>
-          </div>
-        </section>
+        </a>
 
-        <section className="grid">
-          <a
-            className="panel panelLink"
-            href="/ingesta"
-            role="link"
-            aria-label="Ir a Ingesta GLPI"
-          >
-            <h3 className="pTitle">Ingesta GLPI</h3>
-            <p className="pText">
-              Conectá tickets aprobados y convertí formularios en eventos listos
-              para validar.
-            </p>
-          </a>
-          
-          <article className="panel">
-            <h3 className="pTitle">Validación de conflictos</h3>
-            <p className="pText">
-              Detección automática de choques de espacio/horario y recursos
-              críticos.
-            </p>
-          </article>
+         <a className="lp-card lp-card--link" href="/events" aria-label="Ver lista de Eventos">
+          <h3 className="lp-card-title">Lista Eventos</h3>
+          <p className="lp-card-text">
+            Visualización de eventos tentativos. 
+          </p>
+        </a>
 
-          <article className="panel">
-            <h3 className="pTitle">Calendario & Reportes</h3>
-            <p className="pText">
-              Visualización por áreas, estados y métricas para seguimiento
-              institucional.
-            </p>
-          </article>
+        <article className="lp-card">
+          <h3 className="lp-card-title">Validación de conflictos</h3>
+          <p className="lp-card-text">
+            Detección automática de choques por espacio/horario y recursos críticos.
+          </p>
+        </article>
 
-        </section>
+      </section>
 
-        <section className="stats">
-          <div className="kpi">
-            <div>Eventos activos</div>
-            <strong>12</strong>
-          </div>
-          <div className="kpi">
-            <div>Espacios</div>
-            <strong>8</strong>
-          </div>
-          <div className="kpi">
-            <div>Solicitudes hoy</div>
-            <strong>3</strong>
-          </div>
-        </section>
-
-        <footer className="footer">
-          <span>© {new Date().getFullYear()} Gestión de Eventos</span>
-          <span>v0.1 · Demo</span>
-        </footer>
-      </div>
-    </div>
+      <footer className="lp-footer" aria-label="Información del sitio">
+        <span>© {new Date().getFullYear()} Gestión de Eventos</span>
+        <span className="lp-dot">•</span>
+        <span>v0.1 · Demo</span>
+      </footer>
+    </main>
   );
 }

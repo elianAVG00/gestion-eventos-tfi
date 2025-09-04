@@ -1,0 +1,192 @@
+:root {
+  --negro: #0e0e11;
+  --negro-2: #141417;
+  --blanco: #ffffff;
+  --gris: #bcbcbc;
+  --gris-oscuro: #2e2e2e;
+  --bordo: #800020;
+  --bordo-suave: rgba(128, 0, 32, 0.18);
+  --radius: 12px;
+  --shadow-1: 0 6px 20px rgba(0,0,0,0.35);
+  --maxw: 420px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--negro); color: var(--blanco); font-family: system-ui,"Segoe UI",Roboto,Arial,sans-serif; }
+
+.login-wrap {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-items: start;
+}
+
+/* Marca superior (consistente con landing) */
+.login-brand {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--gris-oscuro);
+}
+
+.login-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--bordo);
+  color: var(--blanco);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.login-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.login-title { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.login-badge { color: var(--gris); font-size: .9rem; }
+
+/* Tarjeta de login */
+.login-card {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 48px auto;
+  background: var(--negro-2);
+  border: 1px solid var(--gris-oscuro);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-1);
+}
+
+.login-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.login-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Alertas */
+.login-alert {
+  background: #2a1317;
+  border: 1px solid var(--bordo);
+  color: #ffd7df;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+/* Formulario */
+.login-form { display: grid; gap: 12px; }
+
+.form-group { display: grid; gap: 6px; }
+.form-label { font-size: .95rem; color: var(--blanco); }
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--gris-oscuro);
+  color: var(--blanco);
+  border: 1px solid var(--gris);
+  border-radius: 10px;
+}
+
+.form-input:focus {
+  outline: 2px solid var(--bordo);
+  outline-offset: 2px;
+  border-color: var(--bordo);
+}
+
+.form-input-with-btn {
+  position: relative;
+  display: grid;
+}
+
+.icon-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: var(--blanco);
+  border: 1px solid var(--gris-oscuro);
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+}
+.icon-btn:hover { background: var(--bordo-suave); border-color: var(--bordo); }
+
+.form-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gris);
+  font-size: .95rem;
+}
+
+.link-ghost {
+  color: var(--gris);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--gris-oscuro);
+}
+.link-ghost:hover { color: var(--blanco); border-color: var(--bordo); }
+
+/* Botones */
+.btn {
+  background-color: var(--gris-oscuro);
+  color: var(--blanco);
+  padding: 10px 14px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: background-color .2s ease, transform .15s ease, border-color .2s ease;
+}
+
+.btn-primary {
+  background-color: var(--bordo);
+  border-color: var(--bordo);
+  box-shadow: var(--shadow-1);
+}
+.btn-primary:hover { background-color: #9a0030; border-color: #9a0030; transform: translateY(-1px); }
+.btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+.wide { width: 100%; }
+
+.form-footnote {
+  color: var(--gris);
+  font-size: .85rem;
+  text-align: center;
+}
+
+/* Accesibilidad */
+.form-input[aria-invalid="true"] { border-color: #d34; }
+
+/* Respeta preferencias de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .btn, .icon-btn { transition: none; }
+}

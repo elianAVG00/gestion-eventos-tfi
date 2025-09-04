@@ -1,91 +1,135 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import { Download, Plus, Trash2, X } from "lucide-react";
-import "./Calendar.css"; 
+import "../styles/Calendar.css";
+import HomeButton from "./HomeButton";
+import type { Event as DomainEvent } from "../interfaces/Event";
+import SyncButton from "./SyncButton";
 
-type EventItem = {
+/** ===================== Tipos UI (presentación) ===================== **/
+type CalendarEvent = {
   id: string;
   title: string;
-  start: string;       // ISO local, ej: 2025-08-26T14:00:00
-  end?: string;        // ISO local
+  start: string;        // ISO local o UTC, se normaliza en getEventsForDay
+  end?: string;
   description?: string;
   location?: string;
-  color?: string;
+  color: string;        // requerido en la capa UI
 };
 
-const mockEvents: EventItem[] = [
-  { id: "1", title: "Acto de colación", start: "2025-09-03T10:00:00", end: "2025-09-03T12:00:00", description: "Ceremonia de graduación de la promoción 2025", location: "Aula Magna", color: "#3b82f6" },
-  { id: "2", title: "Seminario Ingeniería", start: "2025-09-08T09:00:00", end: "2025-09-10T17:00:00", description: "Seminario con invitados externos sobre nuevas tecnologías", location: "Laboratorio A", color: "#10b981" },
-  { id: "3", title: "Reunión de equipo", start: "2025-08-26T14:00:00", end: "2025-08-26T15:30:00", description: "Revisión semanal del proyecto", location: "Sala de conferencias", color: "#f59e0b" },
-  { id: "4", title: "Presentación final", start: "2025-08-28T16:00:00", end: "2025-08-28T18:00:00", description: "Presentación del proyecto final", location: "Auditorio principal", color: "#ef4444" },
-];
-
+/** ===================== Utilidades de fecha ===================== **/
 function pad(n: number) {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
-// ✅ Obtiene clave de fecha LOCAL (YYYY-MM-DD)
+// Clave YYYY-MM-DD en horario LOCAL (para grid)
 function dateKeyLocal(input: Date | string) {
   const d = typeof input === "string" ? new Date(input) : input;
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+// Formato hora corta (para el chip del evento)
+function formatTime(dateStr: string) {
+  return new Date(dateStr).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+}
+
+/** ===================== Paleta & Hash para colores ===================== **/
+const PALETTE = [
+  "#3b82f6", "#10b981", "#f59e0b", "#ef4444",
+  "#8b5cf6", "#06b6d4", "#84cc16", "#f97316"
+];
+
+// Hash simple y estable (djb2 simplificado)
+function hashStr(s: string) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = (h * 33) ^ s.charCodeAt(i);
+  return Math.abs(h);
+}
+
+function colorForEvent(e: DomainEvent): string {
+  // Priorizamos tipo; si no hay, usamos espacio; sino id.
+  const base = e.eventType?.trim() || e.physicalSpace?.trim() || e.id;
+  const idx = hashStr(base) % PALETTE.length;
+  return PALETTE[idx];
+}
+
+/** ===================== Calendario ===================== **/
 export default function InteractiveCalendar() {
-  const [events, setEvents] = useState<EventItem[]>(mockEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showEventModal, setShowEventModal] = useState(false);
-  const [eventForm, setEventForm] = useState<EventItem>({
+  const [eventForm, setEventForm] = useState<CalendarEvent>({
     id: "",
     title: "",
     start: "",
     end: "",
     description: "",
     location: "",
-    color: "#3b82f6"
+    color: PALETTE[0]
   });
 
-  const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316"];
+  // Carga desde API
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await axios.get<DomainEvent[]>("http://localhost:9090/api/events");
+        const mapped: CalendarEvent[] = data.map((ev) => ({
+          id: ev.id,
+          title: ev.title,
+          start: ev.startDateTime,
+          end: ev.endDateTime || undefined,
+          description: ev.description || undefined,
+          location: ev.physicalSpace || undefined,
+          // Si en el futuro tu backend envía un color opcional, úsalo aquí:
+          color: colorForEvent(ev)
+        }));
+        setEvents(mapped);
+      } catch (err) {
+        console.error("Error cargando eventos:", err);
+        setEvents([]); // estado seguro
+      }
+    })();
+  }, []);
 
-  const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-  };
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
+  // Días del mes (42 celdas)
+  const days = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay(); // 0=Dom
 
-    const days: { date: Date; isCurrentMonth: boolean }[] = [];
-
-    // Días del mes anterior
+    const out: { date: Date; isCurrentMonth: boolean }[] = [];
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-      days.push({ date: new Date(year, month, -i), isCurrentMonth: false });
+      out.push({ date: new Date(year, month, -i), isCurrentMonth: false });
     }
-    // Días del mes actual
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push({ date: new Date(year, month, day), isCurrentMonth: true });
+      out.push({ date: new Date(year, month, day), isCurrentMonth: true });
     }
-    // Completar hasta 6x7=42
-    const remaining = 42 - days.length;
+    const remaining = 42 - out.length;
     for (let day = 1; day <= remaining; day++) {
-      days.push({ date: new Date(year, month + 1, day), isCurrentMonth: false });
+      out.push({ date: new Date(year, month + 1, day), isCurrentMonth: false });
     }
-    return days;
-  };
+    return out;
+  }, [currentDate]);
 
-  // ✅ Sin UTC shift: compara YYYY-MM-DD locales
+  const todayKey = dateKeyLocal(new Date());
+  const isToday = (d: Date) => dateKeyLocal(d) === todayKey;
+
+  // Eventos por día (usando claves locales YYYY-MM-DD)
   const getEventsForDay = (date: Date) => {
     const key = dateKeyLocal(date);
-    return events.filter(e => {
-      const startKey = e.start ? (e.start.length >= 10 ? e.start.slice(0, 10) : dateKeyLocal(e.start)) : key;
-      const endKey = e.end ? (e.end.length >= 10 ? e.end.slice(0, 10) : dateKeyLocal(e.end)) : startKey;
+    return events.filter((e) => {
+      // soporta strings ISO con TZ; si no hay 10 chars, fallback a dateKeyLocal
+      const startKey = e.start?.length >= 10 ? e.start.slice(0, 10) : dateKeyLocal(e.start);
+      const endKey = e.end && e.end.length >= 10 ? e.end.slice(0, 10) : startKey;
       return key >= startKey && key <= endKey;
     });
   };
 
-  const openEventModal = (event: EventItem | null = null) => {
+  /** ===== Modal (alta/edición local, opcional si mantienes mock) ===== **/
+  const openEventModal = (event: CalendarEvent | null = null) => {
     if (event) {
       setEventForm({
         id: event.id,
@@ -94,10 +138,10 @@ export default function InteractiveCalendar() {
         end: event.end ? event.end.slice(0, 16) : "",
         description: event.description || "",
         location: event.location || "",
-        color: event.color || "#3b82f6"
+        color: event.color
       });
     } else {
-      setEventForm({ id: "", title: "", start: "", end: "", description: "", location: "", color: "#3b82f6" });
+      setEventForm({ id: "", title: "", start: "", end: "", description: "", location: "", color: PALETTE[0] });
     }
     setShowEventModal(true);
   };
@@ -105,30 +149,28 @@ export default function InteractiveCalendar() {
   const saveEvent = () => {
     if (!eventForm.title || !eventForm.start) return;
 
-    const eventData: EventItem = {
+    const eventData: CalendarEvent = {
       ...eventForm,
-      id: eventForm.id || (crypto as any).randomUUID?.() || String(Date.now()),
+      id: eventForm.id || String(Date.now()),
       start: eventForm.start + ":00",
       end: eventForm.end ? eventForm.end + ":00" : eventForm.start + ":00"
     };
 
-    setEvents(prev => eventForm.id ? prev.map(e => (e.id === eventForm.id ? eventData : e)) : [...prev, eventData]);
+    setEvents((prev) => (eventForm.id ? prev.map((e) => (e.id === eventForm.id ? eventData : e)) : [...prev, eventData]));
     setShowEventModal(false);
-    setEventForm({ id: "", title: "", start: "", end: "", description: "", location: "", color: "#3b82f6" });
+    setEventForm({ id: "", title: "", start: "", end: "", description: "", location: "", color: PALETTE[0] });
   };
 
   const deleteEvent = (eventId: string) => {
-    setEvents(prev => prev.filter(e => e.id !== eventId));
+    setEvents((prev) => prev.filter((e) => e.id !== eventId));
     setShowEventModal(false);
   };
 
   const exportToICS = () => {
-    const icsEvents = events.map(event => {
+    const icsEvents = events.map((event) => {
       const start = new Date(event.start);
       const end = new Date(event.end || event.start);
-
       const dt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-
       return [
         "BEGIN:VEVENT",
         `UID:${event.id}`,
@@ -142,7 +184,6 @@ export default function InteractiveCalendar() {
     });
 
     const icsContent = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Gestión de Eventos//ES", ...icsEvents, "END:VCALENDAR"].join("\n");
-
     const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -153,16 +194,12 @@ export default function InteractiveCalendar() {
   };
 
   const navigateMonth = (direction: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev) => {
       const d = new Date(prev);
       d.setMonth(prev.getMonth() + direction);
       return d;
     });
   };
-
-  const days = getDaysInMonth(currentDate);
-  const today = new Date();
-  const isToday = (date: Date) => dateKeyLocal(date) === dateKeyLocal(today);
 
   return (
     <div className="calendar-container">
@@ -187,13 +224,13 @@ export default function InteractiveCalendar() {
         </div>
       </div>
 
-      {/* Calendar Navigation */}
+      {/* Nav */}
       <div className="calendar-wrapper">
         <div className="calendar-nav">
           <div className="nav-controls">
             <button onClick={() => navigateMonth(-1)} className="nav-btn">←</button>
             <h2 className="nav-title">
-              {currentDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" })}
+              {currentDate.toLocaleDateString("es-AR", { month: "long", year: "numeric" })}
             </h2>
             <button onClick={() => navigateMonth(1)} className="nav-btn">→</button>
           </div>
@@ -201,11 +238,11 @@ export default function InteractiveCalendar() {
         </div>
       </div>
 
-      {/* Calendar Grid */}
+      {/* Grid */}
       <div className="calendar-wrapper">
         <div className="calendar-grid">
           <div className="calendar-header-days">
-            {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(d => (
+            {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((d) => (
               <div key={d} className="header-day">{d}</div>
             ))}
           </div>
@@ -225,7 +262,7 @@ export default function InteractiveCalendar() {
                   </div>
 
                   <div className="day-events">
-                    {dayEvents.slice(0, 2).map(event => (
+                    {dayEvents.slice(0, 2).map((event) => (
                       <div
                         key={event.id}
                         onClick={() => openEventModal(event)}
@@ -245,7 +282,7 @@ export default function InteractiveCalendar() {
         </div>
       </div>
 
-      {/* Event Modal */}
+      {/* Modal (edición local) */}
       {showEventModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -260,7 +297,7 @@ export default function InteractiveCalendar() {
                 <input
                   type="text"
                   value={eventForm.title}
-                  onChange={(e) => setEventForm(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) => setEventForm((p) => ({ ...p, title: e.target.value }))}
                   className="form-input"
                   placeholder="Título del evento"
                 />
@@ -272,7 +309,7 @@ export default function InteractiveCalendar() {
                   <input
                     type="datetime-local"
                     value={eventForm.start}
-                    onChange={(e) => setEventForm(prev => ({ ...prev, start: e.target.value }))}
+                    onChange={(e) => setEventForm((p) => ({ ...p, start: e.target.value }))}
                     className="form-input"
                   />
                 </div>
@@ -281,7 +318,7 @@ export default function InteractiveCalendar() {
                   <input
                     type="datetime-local"
                     value={eventForm.end}
-                    onChange={(e) => setEventForm(prev => ({ ...prev, end: e.target.value }))}
+                    onChange={(e) => setEventForm((p) => ({ ...p, end: e.target.value }))}
                     className="form-input"
                   />
                 </div>
@@ -292,7 +329,7 @@ export default function InteractiveCalendar() {
                 <input
                   type="text"
                   value={eventForm.location}
-                  onChange={(e) => setEventForm(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={(e) => setEventForm((p) => ({ ...p, location: e.target.value }))}
                   className="form-input"
                   placeholder="Ubicación del evento"
                 />
@@ -302,21 +339,22 @@ export default function InteractiveCalendar() {
                 <label className="form-label">Descripción</label>
                 <textarea
                   value={eventForm.description}
-                  onChange={(e) => setEventForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) => setEventForm((p) => ({ ...p, description: e.target.value }))}
                   className="form-textarea"
                   placeholder="Descripción del evento"
                 />
               </div>
 
+              {/* Picker de color local (solo UI) */}
               <div className="form-group">
                 <label className="form-label">Color</label>
                 <div className="color-picker">
-                  {colors.map(color => (
+                  {PALETTE.map((c) => (
                     <button
-                      key={color}
-                      onClick={() => setEventForm(prev => ({ ...prev, color }))}
-                      className={`color-option ${eventForm.color === color ? "selected" : ""}`}
-                      style={{ backgroundColor: color }}
+                      key={c}
+                      onClick={() => setEventForm((p) => ({ ...p, color: c }))}
+                      className={`color-option ${eventForm.color === c ? "selected" : ""}`}
+                      style={{ backgroundColor: c }}
                     />
                   ))}
                 </div>
@@ -326,7 +364,7 @@ export default function InteractiveCalendar() {
             <div className="modal-footer">
               <div className="modal-footer-left">
                 {eventForm.id && (
-                  <button onClick={() => deleteEvent(eventForm.id!)} className="btn btn-danger">
+                  <button onClick={() => deleteEvent(eventForm.id)} className="btn btn-danger">
                     <Trash2 size={16} /> Eliminar
                   </button>
                 )}
@@ -341,6 +379,9 @@ export default function InteractiveCalendar() {
           </div>
         </div>
       )}
+
+      <HomeButton />
+      <SyncButton />
     </div>
   );
 }

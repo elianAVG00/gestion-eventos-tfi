@@ -1,4 +1,4 @@
-package ar.unla.gestion_eventos.domain;
+package ar.unla.gestion_eventos.Domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

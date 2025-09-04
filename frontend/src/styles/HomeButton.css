@@ -1,0 +1,39 @@
+.home-btn-floating {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+
+  background-color: var(--negro);   /* negro, consistente con tarjetas */
+  color: var(--blanco);             /* texto blanco */
+  border: 2px solid var(--bordo);   /* borde bordó */
+  border-radius: var(--radius);
+  padding: 10px 16px;
+
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  transition: background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+}
+
+.home-btn-floating:hover {
+  background-color: var(--bordo);   /* al hover, se invierte */
+  color: var(--blanco);
+  border-color: var(--bordo);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.home-btn-floating:active {
+  transform: translateX(-50%) translateY(0);
+}
+
+.home-btn-floating span {
+  line-height: 1;
+}
