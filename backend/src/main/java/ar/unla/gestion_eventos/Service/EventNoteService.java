@@ -4,14 +4,15 @@ import ar.unla.gestion_eventos.Domain.Event;
 import ar.unla.gestion_eventos.Domain.EventNote;
 import ar.unla.gestion_eventos.Repository.EventNoteRepository;
 import ar.unla.gestion_eventos.Repository.EventRepository;
-import ar.unla.gestion_eventos.dto.CreateEventNoteRequest;
-import ar.unla.gestion_eventos.dto.CreateEventNoteResponse;
-import ar.unla.gestion_eventos.dto.EventDto;
-import ar.unla.gestion_eventos.dto.EventNoteMapper;
+import ar.unla.gestion_eventos.dto.*;
 import ar.unla.gestion_eventos.glpi.GlpiClient;
 import ar.unla.gestion_eventos.glpi.GlpiSyncService;
 import jakarta.validation.ValidationException;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -65,5 +66,17 @@ public class EventNoteService {
                 EventDto.from(refreshed),
                 refreshPending
         );
+    }
+
+    public List<EventNoteDto> findAllForEvent(long glpiTicketId) {
+        List<EventNote> noteList = noteRepository.findAllByGlpiTicketId(glpiTicketId);
+
+        if (noteList == null || noteList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return noteList.stream()
+                .map(EventNoteMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

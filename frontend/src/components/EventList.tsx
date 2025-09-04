@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { Event } from '../interfaces/Event';
 import "../styles/EventList.css";
 import HomeButton from './HomeButton';
+import AddComment from './AddComment';
 
 const EventList: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -168,6 +169,8 @@ const EventList: React.FC = () => {
                         </span>
                       </div>
                     </div>
+                    {/** boton para agregar comentarios asociados al evento */}
+                    <AddComment glpiTicketId={event.glpiTicketId} />
                   </section>
                 </article>
               );

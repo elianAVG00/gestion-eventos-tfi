@@ -41,7 +41,8 @@
 
 .event-label {
   color: var(--gris);
-  min-width: 84px; /* alineación simple */
+  min-width: 84px;
+  /* alineación simple */
 }
 
 .event-value {
@@ -100,7 +101,8 @@
 .event-card.expanded .event-details-collapsible,
 .event-card:hover .event-details-collapsible,
 .event-card:focus-visible .event-details-collapsible {
-  max-height: 400px; /* suficiente para el contenido previsto */
+  max-height: 400px;
+  /* suficiente para el contenido previsto */
 }
 
 /* Estado visual sutil cuando está expandida por clic */
@@ -118,4 +120,76 @@
   text-align: center;
   border: 1px dashed var(--gris-oscuro);
   border-radius: var(--radius);
+}
+
+/* Estilos para la sección de comentarios */
+.add-comment-container {
+  margin-top: 8px;
+  /* separación respecto de los detalles del evento */
+}
+
+/* Botón que muestra el formulario */
+.add-comment-toggle {
+  background: var(--bordo);
+  color: var(--blanco);
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Formulario de comentario */
+.add-comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-comment-textarea {
+  background: #111113;
+  border: 1px solid var(--gris-oscuro);
+  border-radius: 6px;
+  color: var(--blanco);
+  padding: 6px;
+  resize: vertical;
+}
+
+/* Contenedor de botones del formulario */
+.add-comment-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Botón de envío */
+.add-comment-submit {
+  background: var(--bordo);
+  color: var(--blanco);
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Botón de cancelación */
+.add-comment-cancel {
+  background: var(--gris-oscuro);
+  color: var(--blanco);
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Mensajes de feedback */
+.add-comment-success {
+  color: #4caf50;
+  font-size: 0.8rem;
+}
+
+.add-comment-error {
+  color: #ff5252;
+  font-size: 0.8rem;
 }
