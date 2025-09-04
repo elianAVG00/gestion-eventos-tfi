@@ -1,11 +1,15 @@
+// src/pages/Login.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogIn, Eye, EyeOff, Shield } from "lucide-react";
 import "../styles/Login.css";
-import HomeButton from "../components/HomeButton";
+import { useAuth } from "../hooks/useAuth";
+import { validateMockCredentials } from "../utils/auth";
 
 export default function Login() {
+  const { login } = useAuth(); 
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
@@ -17,7 +21,6 @@ export default function Login() {
     e.preventDefault();
     setError(null);
 
-    // Validación mínima
     if (!email || !email.includes("@")) {
       setError("Ingrese un correo válido.");
       return;
@@ -27,20 +30,20 @@ export default function Login() {
       return;
     }
 
-    // Mock de autenticación (solo front)
     setSubmitting(true);
     try {
-      // Regla mock: cualquier email + cualquier password pasan
-      // (si quisieras un demo “real”: admin@unla.edu.ar / demo123)
-      const session = { user: email, ts: Date.now() };
-      if (remember) {
-        localStorage.setItem("admin@unla.edu.ar", JSON.stringify(session));
+      if (validateMockCredentials(email, password)) {
+        const userData = {
+          email,
+          ts: Date.now()
+        };
+        login(userData, remember);
+        navigate("/landing");
       } else {
-        sessionStorage.setItem("admin", JSON.stringify(session));
+        setError("Credenciales inválidas.");
       }
-      navigate("/calendar"); // redirige a tu calendario
-    } catch {
-      setError("No se pudo iniciar sesión. Intente nuevamente.");
+    } catch (err) {
+      setError("Error al iniciar sesión.");
     } finally {
       setSubmitting(false);
     }
@@ -138,9 +141,6 @@ export default function Login() {
           </div>
         </form>
       </section>
-
-      {/* Botón Inicio flotante (abajo-centro) como en el resto del sistema */}
-      <HomeButton />
     </main>
   );
 }

@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Download, Plus, Trash2, X } from "lucide-react";
 import "../styles/Calendar.css";
-import HomeButton from "./HomeButton";
+import HomeButton from "../components/HomeButton";
 import type { Event as DomainEvent } from "../interfaces/Event";
-import SyncButton from "./SyncButton";
+import SyncButton from "../components/SyncButton";
 
 /** ===================== Tipos UI (presentación) ===================== **/
 type CalendarEvent = {
