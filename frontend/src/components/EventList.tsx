@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import type { Event } from '../interfaces/Event';
+import type { Note } from '../interfaces/Note';
 import "../styles/EventList.css";
 import HomeButton from './HomeButton';
 import AddComment from './AddComment';
@@ -10,6 +11,11 @@ const EventList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | number | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [notesError, setNotesError] = useState<string | null>(null);
+  const [selectedEventTitle, setSelectedEventTitle] = useState<string>('');
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -56,10 +62,50 @@ const EventList: React.FC = () => {
 
   const handleMouseEnter = (id: string | number) => setExpandedId(id);
   const handleMouseLeave = (id: string | number) => {
-    // si el usuario abrió por clic, no colapsamos en mouseleave
     if (expandedId !== id) return;
     setExpandedId(null);
   };
+
+  // Obtiene las notas del evento y abre el modal de comentarios
+  const handleViewComments = async (
+    e: React.MouseEvent,
+    glpiTicketId: string,
+    title: string
+  ) => {
+    e.stopPropagation();
+    setLoadingNotes(true);
+    setNotesError(null);
+    setSelectedEventTitle(title);
+    try {
+      const url = `http://localhost:9090/api/events/${glpiTicketId}/notes`;
+      const response = await axios.get<Note[]>(url);
+      setNotes(response.data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setNotesError(message);
+      setNotes([]);
+    } finally {
+      setLoadingNotes(false);
+      setShowCommentsModal(true);
+    }
+  };
+
+  // Cierra el modal de comentarios
+  const handleCloseModal = () => {
+    setShowCommentsModal(false);
+  };
+
+  // poder cerrar el modal con la tecla Esc
+  useEffect(() => {
+    if (!showCommentsModal) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showCommentsModal]);
 
   if (loading) {
     return (
@@ -169,6 +215,24 @@ const EventList: React.FC = () => {
                         </span>
                       </div>
                     </div>
+                    {/* boton para ver comentarios del evento */}
+                    <div
+                      className="view-comments-container"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="view-comments-button"
+                        onClick={(e) =>
+                          handleViewComments(
+                            e,
+                            event.glpiTicketId,
+                            event.title || ''
+                          )
+                        }
+                      >
+                        Ver comentarios
+                      </button>
+                    </div>
                     {/** boton para agregar comentarios asociados al evento */}
                     <AddComment glpiTicketId={event.glpiTicketId} />
                   </section>
@@ -178,6 +242,41 @@ const EventList: React.FC = () => {
           )}
         </div>
       </div>
+      {showCommentsModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">
+                Comentarios{selectedEventTitle ? ` - ${selectedEventTitle}` : ''}
+              </h3>
+              <button className="modal-close" onClick={handleCloseModal}>
+                &times;
+              </button>
+            </div>
+            {/* Cuerpo del modal con los comentarios */}
+            {loadingNotes ? (
+              <p>Cargando comentarios...</p>
+            ) : notesError ? (
+              <p>{notesError}</p>
+            ) : notes.length === 0 ? (
+              <p>No hay comentarios.</p>
+            ) : (
+              <ul className="comments-list">
+                {notes.map((note) => (
+                  <li key={note.id} className="comment-item">
+                    <p>{note.content}</p>
+                    {note.createdAt && (
+                      <span className="comment-date">
+                        {formatDateTime(note.createdAt)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
       <HomeButton />
     </div>
   );

@@ -128,8 +128,24 @@
   /* separación respecto de los detalles del evento */
 }
 
+/* Contenedor del botón de ver comentarios */
+.view-comments-container {
+  margin-top: 8px;
+}
+
 /* Botón que muestra el formulario */
 .add-comment-toggle {
+  background: var(--bordo);
+  color: var(--blanco);
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Botón para abrir el modal de comentarios */
+.view-comments-button {
   background: var(--bordo);
   color: var(--blanco);
   border: none;
@@ -191,5 +207,30 @@
 
 .add-comment-error {
   color: #ff5252;
+  font-size: 0.8rem;
+}
+
+/* Lista de comentarios dentro del modal */
+.comments-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment-item {
+  border-bottom: 1px solid var(--gris-oscuro);
+  padding: 8px 0;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-date {
+  display: block;
+  margin-top: 4px;
+  color: var(--gris);
   font-size: 0.8rem;
 }

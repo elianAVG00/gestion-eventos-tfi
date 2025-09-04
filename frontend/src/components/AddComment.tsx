@@ -55,6 +55,11 @@ const AddComment: React.FC<AddCommentProps> = ({ glpiTicketId }) => {
                         className="add-comment-textarea"
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
+                                e.stopPropagation();
+                            }
+                        }}
                         rows={3}
                         placeholder="Escribe tu comentario..."
                     />
