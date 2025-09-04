@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import type { Event } from '../interfaces/Event';
 import "../styles/EventList.css";
-import HomeButton from './HomeButton';
+import HomeButton from '../components/HomeButton';
 
 const EventList: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
