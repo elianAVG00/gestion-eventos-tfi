@@ -1,4 +1,5 @@
 import "../styles/LandingPage.css";
+import Logout from "../components/Logout";
 
 export default function LandingPage() {
   return (
@@ -12,10 +13,11 @@ export default function LandingPage() {
             <span className="lp-brand-badge">TFI · UNLa</span>
           </div>
         </div>
+        <Logout/>
 
-        <nav className="lp-header-actions" aria-label="Acción principal">
+        {/* <nav className="lp-header-actions" aria-label="Acción principal">
           <a className="lp-btn lp-btn--primary" href="/login">Ingresar</a>
-        </nav>
+        </nav> */}
       </header>
 
       {/* Hero con CTA centrada */}
@@ -27,7 +29,9 @@ export default function LandingPage() {
           <a className="lp-btn lp-btn--primary" href="/calendar">📅 Ver calendario</a>
         </div>
         <p className="lp-hero-subtitle">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur expedita nobis ab rerum, dicta sit corrupti est dolores? Ullam eum possimus veniam atque impedit quis inventore necessitatibus fuga omnis delectus.
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+          Aspernatur expedita nobis ab rerum, dicta sit corrupti est dolores? 
+          Ullam eum possimus veniam atque impedit quis inventore necessitatibus fuga omnis delectus.
         </p>
 
       </section>

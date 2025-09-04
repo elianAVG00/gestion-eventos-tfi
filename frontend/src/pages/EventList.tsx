@@ -3,8 +3,8 @@ import axios from 'axios';
 import type { Event } from '../interfaces/Event';
 import type { Note } from '../interfaces/Note';
 import "../styles/EventList.css";
-import HomeButton from './HomeButton';
-import AddComment from './AddComment';
+import AddComment from '../components/AddComment';
+import HomeButton from '../components/HomeButton';
 
 const EventList: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
